@@ -3,10 +3,8 @@ const auth= require('../middleware/auth.js');
 const express = require("express");
 const router = express.Router();
 
-// Get user todos
 router.get('/', auth, async (req, res) => {
   try {
-    // Ensure req.user is defined
     const userId = req.user ? req.user.id : null;
 
     if (!userId) {
