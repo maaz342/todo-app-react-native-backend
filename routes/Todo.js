@@ -3,7 +3,6 @@ const auth = require('../middleware/auth.js');
 const express = require("express");
 const router = express.Router();
 
-// Get all to-dos for the authenticated user
 router.get('/', auth, async (req, res) => {
   try {
     const userId = req.user ? req.user.id : null;
@@ -19,7 +18,6 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
-// Add a new to-do for the authenticated user
 router.post('/', auth, async (req, res) => {
   try {
     const userId = req.user ? req.user.id : null;
@@ -40,7 +38,6 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
-// Edit a to-do for the authenticated user
 router.put('/:id', auth, async (req, res) => {
   try {
     const userId = req.user ? req.user.id : null;
@@ -49,17 +46,15 @@ router.put('/:id', auth, async (req, res) => {
       return res.status(401).json({ msg: 'User not authenticated' });
     }
 
-    // Find the to-do by id and userId (to ensure the user is the owner)
     let todo = await Todo.findOne({ _id: req.params.id, userId });
 
     if (!todo) {
       return res.status(404).json({ msg: 'To-do not found' });
     }
 
-    // Update the task
-    todo.task = req.body.task || todo.task;
+    todo.task = req.body.task !== undefined ? req.body.task : todo.task;
+    todo.completed = req.body.completed !== undefined ? req.body.completed : todo.completed;
 
-    // Save the updated to-do
     await todo.save();
     res.json(todo);
   } catch (err) {
@@ -67,7 +62,7 @@ router.put('/:id', auth, async (req, res) => {
   }
 });
 
-// Delete a to-do for the authenticated user
+
 router.delete('/:id', auth, async (req, res) => {
   try {
     const userId = req.user ? req.user.id : null;
@@ -76,7 +71,6 @@ router.delete('/:id', auth, async (req, res) => {
       return res.status(401).json({ msg: 'User not authenticated' });
     }
 
-    // Find the to-do by id and userId (to ensure the user is the owner)
     const todo = await Todo.findOneAndDelete({ _id: req.params.id, userId });
 
     if (!todo) {
